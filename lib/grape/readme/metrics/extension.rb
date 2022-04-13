@@ -7,7 +7,7 @@ module Grape
             sdk_api_key:       ::Grape::ReadMe::Metrics.config.sdk_options.api_key,
             sdk_development:   ::Grape::ReadMe::Metrics.config.sdk_options.development,
             sdk_reject_params: ::Grape::ReadMe::Metrics.config.sdk_options.reject_params,
-            sdk_buffer_length: ::Grape::ReadMe::Metrics.config.sdk_options.buffer_length
+            sdk_buffer_length: ::Grape::ReadMe::Metrics.config.sdk_options.buffer_length,
             user_id:           ::Grape::ReadMe::Metrics.config.id,
             user_label:        ::Grape::ReadMe::Metrics.config.label,
             user_email:        ::Grape::ReadMe::Metrics.config.email
