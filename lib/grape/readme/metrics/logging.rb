@@ -1,17 +1,52 @@
+require "grape/readme/metrics/har/serializer"
 require "grape/readme/metrics/request"
+require "grape/readme/metrics/payload"
+require "httparty"
 
 module Grape
   module ReadMe
     module Metrics
       class Logging < Grape::Middleware::Base
+        def before
+          @start_time = Time.now
+        end
 
         def after
-          request = ::Grape::ReadMe::Metrics::Request.new(env)
+          @duration = ((Time.now - @start_time) * 1000).to_i
+
+          request = Request.new(env, context)
           return unless request.log_metrics?
 
-          # TODO: send API logs to ReadMe
+          # creates a payload that will please the ReadMe overlords
+          payload = Payload.new(
+            Har::Serializer.new(request, response, @start_time, @duration),
+            {
+              id: request.options.user_id,
+              label: request.options.user_label,
+              email: request.options.user_email
+            },
+            clientIPAddress: env["HTTP_X_REAL_IP"] || env["REMOTE_ADDR"],
+            development: request.options.sdk_development
+          )
 
-          header("x-documentation-url", nil)
+          # sends an API log to ReadMe
+          Thread.new do
+            begin
+              HTTParty.post(
+                "https://metrics.readme.io/v1/request",
+                basic_auth: {
+                  username: request.options.sdk_api_key,
+                  password: ""
+                },
+                headers: {
+                  "Content-Type" => "application/json"
+                },
+                body: payload.to_json
+              )
+            rescue StandardError
+              # nothing to do here
+            end
+          end
 
           @app_response
         end

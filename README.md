@@ -34,15 +34,12 @@ Define settings in an initializer (defaults below):
 # config/initializers/grape_readme_metrics.rb
 
 Grape::ReadMe::Metrics.configure do |config|
-  config.sdk_options.api_key = "INSERT_YOUR_README_API_KEY_HERE"
-  config.sdk_options.development = false
-  config.sdk_options.reject_params = ["not_included", "dont_send"]
-  config.sdk_options.buffer_length = 5
+  config.sdk_api_key = "INSERT_YOUR_README_API_KEY_HERE"
+  config.sdk_development = false
 
-  # these defaults can be overridden within Grape endpoints
-  config.id = "guest"
-  config.label = "Guest User"
-  config.email = "guest@example.com"
+  config.user_id = Proc.new { current_user.id || "guest" }
+  config.user_label = "Guest User"
+  config.user_email = "guest@example.com"
 end
 ```
 

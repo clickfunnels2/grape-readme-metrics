@@ -1,3 +1,7 @@
+# 0.0.5
+
+Shit finally works in this version! Hopefully.
+
 # 0.0.4
 
 Downgrade httparty version requirement to 0.14.0.
