@@ -25,11 +25,15 @@ module Grape
           "https://#{host}/api#{path}"
         end
 
-        def httpVersion
+        def content_type
+          env["CONTENT_TYPE"]
+        end
+
+        def http_version
           env["HTTP_VERSION"]
         end
 
-        def queryString(as_object_array = false)
+        def query_string(as_object_array = false)
           return env["QUERY_STRING"].split("&").map { |p| { name: p.split("=")[0], value: p.split("=")[1] } } if as_object_array
           env["QUERY_STRING"]
         end

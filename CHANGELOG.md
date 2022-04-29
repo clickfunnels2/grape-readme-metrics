@@ -1,3 +1,7 @@
+# 0.0.7
+
+Fine-tuned the shit out of the request/response data included in API logs.
+
 # 0.0.6
 
 Made shit work better.

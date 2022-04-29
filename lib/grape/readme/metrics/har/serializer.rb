@@ -67,9 +67,9 @@ module Grape
 			{
 			  method: @request.method,
 			  url: @request.absolute_path,
-			  httpVersion: @request.httpVersion,
+			  httpVersion: @request.http_version,
 			  headers: @request.headers(true),
-			  queryString: @request.queryString(true),
+			  queryString: @request.query_string(true),
 			  cookies: @request.cookies(true),
 			  postData: post_data,
 			  headersSize: -1,
@@ -82,22 +82,36 @@ module Grape
 			{
 			  status: @response.status,
 			  statusText: Rack::Utils::HTTP_STATUS_CODES[@response.status],
-			  httpVersion: @request.httpVersion,
+			  httpVersion: @request.http_version,
 			  headers: @response.headers.map { |n,v| { name: n, value: v } },
 			  cookies: @request.cookies(true),
 			  content: {
 				mimeType: @response.content_type,
-				size: @request.body.bytesize,
-				text: JSON.parse(@request.body)
+				size: response_body_size,
+				text: response_body
 			  },
 			  redirectURL: @response.location.to_s,
 			  headersSize: -1,
-			  bodySize: @request.body.bytesize
+			  bodySize: response_body_size
 		  	}.compact
 		  end
 
 		  def post_data
-			nil
+			return nil unless @request.content_type.present?
+
+			{
+			  text: @request.body,
+			  mimeType: @request.content_type
+		  	}
+		  end
+
+		  def response_body_size
+			response_body.to_s.bytesize
+		  end
+
+		  def response_body
+			return JSON.parse(@response.body.join(",")) if @response.body.class.eql?(Array)
+			JSON.parse(@response.body)
 		  end
 	  	end
 	  end
