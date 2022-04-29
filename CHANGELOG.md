@@ -1,3 +1,7 @@
+# 0.0.6
+
+Made shit work better.
+
 # 0.0.5
 
 Shit finally works in this version! Hopefully.

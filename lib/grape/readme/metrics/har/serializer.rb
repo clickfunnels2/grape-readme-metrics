@@ -1,4 +1,5 @@
-require "grape/readme/metrics/version"
+require "grape/readme/metrics"
+require "os"
 
 module Grape
   module ReadMe
@@ -30,7 +31,7 @@ module Grape
 			{
 			  name: ::Grape::ReadMe::Metrics::SDK_NAME,
 			  version: ::Grape::ReadMe::Metrics::VERSION,
-			  comment: "#{::Grape::ReadMe::Metrics::PLATFORM}/#{RUBY_VERSION}"
+			  comment: comment
 		  	}
 		  end
 
@@ -47,6 +48,13 @@ module Grape
 		  	]
 		  end
 
+		  def comment
+			platform = OS.windows? ? "Windows" : OS.mac? ? "macOS" : OS.linux? ? "Linux" : "Unknown"
+			ruby_version = "ruby #{RUBY_VERSION}"
+
+			"#{platform} / #{ruby_version}"
+		  end
+
 		  def timings
 			{
 			  send: 0,
@@ -58,12 +66,16 @@ module Grape
 		  def request_as_json
 			{
 			  method: @request.method,
-			  url: @request.path,
+			  url: @request.absolute_path,
 			  httpVersion: @request.httpVersion,
 			  headers: @request.headers(true),
 			  queryString: @request.queryString(true),
-			  headersSize: -1
-		  	}
+			  cookies: @request.cookies(true),
+			  postData: post_data,
+			  headersSize: -1,
+			  bodySize: -1,
+			  comment: @request.route.description
+		  	}.compact
 		  end
 
 		  def response_as_json
@@ -71,8 +83,21 @@ module Grape
 			  status: @response.status,
 			  statusText: Rack::Utils::HTTP_STATUS_CODES[@response.status],
 			  httpVersion: @request.httpVersion,
-			  headers: @response.headers.map { |k, v| { name: k, value: v } }
-			}
+			  headers: @response.headers.map { |n,v| { name: n, value: v } },
+			  cookies: @request.cookies(true),
+			  content: {
+				mimeType: @response.content_type,
+				size: @request.body.bytesize,
+				text: JSON.parse(@request.body)
+			  },
+			  redirectURL: @response.location.to_s,
+			  headersSize: -1,
+			  bodySize: @request.body.bytesize
+		  	}.compact
+		  end
+
+		  def post_data
+			nil
 		  end
 	  	end
 	  end

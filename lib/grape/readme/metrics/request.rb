@@ -18,15 +18,19 @@ module Grape
         end
 
         def path
-          "#{env["REQUEST_URI"].slice(/^[^?]+/)}"
+          route.path.gsub(":version", route.version).gsub("(.:format)", "")
+        end
+
+        def absolute_path
+          "https://#{host}/api#{path}"
         end
 
         def httpVersion
           env["HTTP_VERSION"]
         end
 
-        def queryString(as_har_array = false)
-          return env["QUERY_STRING"].split("&").map { |p| { name: p.split("=")[0], value: p.split("=")[1] } } if as_har_array
+        def queryString(as_object_array = false)
+          return env["QUERY_STRING"].split("&").map { |p| { name: p.split("=")[0], value: p.split("=")[1] } } if as_object_array
           env["QUERY_STRING"]
         end
 
@@ -34,9 +38,14 @@ module Grape
           context.params
         end
 
-        def headers(as_har_array = false)
-          return context.headers.map { |k, v| { name: k, value: v } } if as_har_array
+        def headers(as_object_array = false)
+          return context.headers.map { |n,v| { name: n, value: v } } if as_object_array
           context.headers
+        end
+
+        def cookies(as_object_array = false)
+          return context.cookies.each { |n,v| { name: n, value: v } } if as_object_array
+          context.cookies
         end
 
         def method_missing(method_name, *args, &block)
@@ -48,7 +57,7 @@ module Grape
         end
 
         def client_identifier
-          options.user_id || env["HTTP_X_REAL_IP"] || env["REMOTE_ADDR"]
+          options.user_id
         end
 
         def log_metrics?
@@ -56,6 +65,12 @@ module Grape
           return true if options.valid?
 
           fail ArgumentError.new(options.errors.full_messages)
+        end
+
+        private
+
+        def host
+          context.headers["Host"]
         end
       end
     end

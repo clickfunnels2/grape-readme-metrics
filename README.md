@@ -35,7 +35,7 @@ Define settings in an initializer (defaults below):
 
 Grape::ReadMe::Metrics.configure do |config|
   config.sdk_api_key = "INSERT_YOUR_README_API_KEY_HERE"
-  config.sdk_development = false
+  config.sdk_development = true || false
 
   config.user_id = Proc.new { current_user.id || "guest" }
   config.user_label = "Guest User"

@@ -7,6 +7,8 @@ module Grape
   module ReadMe
     module Metrics
       class Logging < Grape::Middleware::Base
+        README_METRICS_API_ENDPOINT = "https://metrics.readme.io/v1/request"
+
         def before
           @start_time = Time.now
         end
@@ -33,7 +35,7 @@ module Grape
           Thread.new do
             begin
               HTTParty.post(
-                "https://metrics.readme.io/v1/request",
+                README_METRICS_API_ENDPOINT,
                 basic_auth: {
                   username: request.options.sdk_api_key,
                   password: ""
