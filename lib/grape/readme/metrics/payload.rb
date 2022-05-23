@@ -8,7 +8,7 @@ module Grape
 
 		def initialize(har, user_info, clientIPAddress:, development:)
 		  @to_json = [{
-			logId: UUID.new.generate,
+			_id: UUID.new.generate,
 			group: user_info,
 			clientIPAddress: clientIPAddress || "1.1.1.1",
 			development: development || false,

@@ -14,6 +14,12 @@ module Grape
         end
 
         def after
+          # we don't want to spam ReadMe with logs from local tests and CI runs
+          return if Rails.env.test?
+
+          # we can't log an API response that doesn't exist
+          return unless response.present?
+
           @duration = ((Time.now - @start_time) * 1000).to_i
 
           request = Request.new(env, context)

@@ -1,3 +1,11 @@
+# 0.0.8
+
+Now sending better fucking log data based on feedback from ReadMe engineers.
+
+FIX: Replace "logId" with "_id" in the log payload
+FIX: Include response.content in entries in the log payload, even if empty
+FIX: Skip logging in the Rails test environment
+
 # 0.0.7
 
 Fine-tuned the shit out of the request/response data included in API logs.
